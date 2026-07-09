@@ -6,9 +6,9 @@ No backend. No API keys. No Instagram login. Just a CSV export of your following
 
 ## Why This Exists
 
-If you're trying to use Instagram for dating (especially in the gay community), your profile IS your resume. Two things matter:
+If you're trying to use Instagram for dating, your profile IS your resume. Two things matter:
 
-1. **Your ratio** — following 2,000 people when you have 1,500 followers signals low social value. Unfollowing brands, dead accounts, and 10K+ accounts you'll never interact with is the fastest fix.
+1. **Your ratio** — following 5,000 people when you have 1,500 followers signals low social value. Unfollowing brands, dead accounts, and 10K+ accounts you'll never interact with, ramdom people, meme accounts is the fastest fix.
 2. **Your existing graph is an untapped dating pool** — you already follow people you find interesting. Nobody helps you systematically work through that list.
 
 ## How It Works
@@ -48,6 +48,8 @@ Swipe through every account you follow. Each card shows:
 
 **Category filter tabs** let you batch-process by type: blast through all Dead Accounts first (just spam ← ← ←), then Brands, then 10K+ accounts, then review the ambiguous ones last.
 
+Right-swipe = keep following them, left = unfollow them.
+
 **Output:** a CSV of `username, decision, followers, category` — where decision is `keep` or `unfollow`. Feed the unfollow list to a browser automation tool (see [OpenClaw Integration](#openclaw-integration)).
 
 ### Love Mode
@@ -60,8 +62,6 @@ The AI categorization uses a two-pass approach:
 
 ### Pass 1: Instagram's Category Field
 If the CSV includes Instagram's own category metadata (e.g., "DJ", "Musician/Band", "Shopping & Retail"), this is the most reliable signal. The engine maps ~50 Instagram categories into buckets:
-
-**Auto-Keep:** DJ, Musician/Band, Artist, Photographer, Dance & Night Club, Festival, Art Gallery, etc.
 
 **Auto-Unfollow:** News & Media Website, Shopping & Retail, Product/Service, Fan Page, Magazine, etc.
 
@@ -76,7 +76,7 @@ For uncategorized accounts, the engine scans bios and usernames against keyword 
 
 ### Pass 3: Heuristics
 - **Dead Accounts:** ≤2 posts and not private
-- **Friends & Family:** <2,000 followers and not a business account
+- **Friends & Family:** <6,000 followers and not a business account
 - **10K+ Ratio Poison:** >10,000 followers and didn't match any keep category
 
 ## Persistence
@@ -110,22 +110,18 @@ The exported CSV is designed to be fed directly to [OpenClaw](https://openclaw.a
 - Two-mode swipe UI with keyboard shortcuts (← → arrows, Cmd+Z undo)
 - AI categorization engine (Instagram categories + bio keywords + heuristics)
 - Category filter tabs for batch processing
-- Love mode scoring and three-tier outreach plan
 - Session persistence via localStorage
 - CSV export at any point during or after swiping
-- Profile photo display from Avatar URL
-- "View" button opens Instagram profile in new tab
 
 ### 🔨 Could Be Built
+- Profile photo display from Avatar URL
+- "View" button opens Instagram profile in new tab
 - **Mobile swipe gestures** — touch/drag swiping for phone use
 - **Photo grid preview** — embed recent posts via Toolzu or similar
-- **Mutual follow detection** — if the CSV includes this data, factor it into scoring (+30 points) and tier assignment
+- **Mutual follow detection** — if the CSV includes this data, factor it into scoring (+30 points) and tier assignment for the love side of the producr
 - **OpenClaw integration** — direct "Execute Unfollows" button that triggers the automation
-- **DM template generator** — suggest openers based on shared interests (bio keyword overlap)
-- **Profile strength tracker** — before/after ratio metrics
 - **Batch actions** — "unfollow all Dead Accounts" without swiping each one
 - **Import from multiple sources** — combine data from different export tools
-- **Collaborative mode** — share prospect lists with friends for second opinions
 - **Re-export enriched CSV** — add the AI category and score to the original CSV for use in other tools
 
 ## Tech Stack
