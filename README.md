@@ -4,8 +4,6 @@ A local-first Instagram account management tool with two modes: **Vanity** (clea
 
 No backend. No API keys. No Instagram login. Just a CSV export of your following list + a single HTML file you open in Chrome.
 
-![screenshot](screenshot.png)
-
 ## Why This Exists
 
 If you're trying to use Instagram for dating (especially in the gay community), your profile IS your resume. Two things matter:
