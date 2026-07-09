@@ -114,6 +114,7 @@ The exported CSV is designed to be fed directly to [OpenClaw](https://openclaw.a
 - CSV export at any point during or after swiping
 
 ### 🔨 Could Be Built
+- current following updated to the app in real time
 - Profile photo display from Avatar URL
 - "View" button opens Instagram profile in new tab
 - **Mobile swipe gestures** — touch/drag swiping for phone use
