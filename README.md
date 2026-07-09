@@ -89,19 +89,6 @@ For uncategorized accounts, the engine scans bios and usernames against keyword 
 - **Friends & Family:** <2,000 followers and not a business account
 - **10K+ Ratio Poison:** >10,000 followers and didn't match any keep category
 
-## Scoring Model (Love Mode)
-
-Base score: 50
-
-| Signal | Points |
-|--------|--------|
-| Followers < 5K | +10 |
-| Followers 5K-20K | +5 |
-| Bio mentions: crypto, defi, web3, nyc, dj, music, fitness, gym | +3 each |
-| City is NYC/Brooklyn/Manhattan | +10 |
-
-Max score: 100. Scoring is intentionally simple — the main value is in the tiered outreach strategy, not precision ranking.
-
 ## Persistence
 
 All session data is saved to `localStorage`:
