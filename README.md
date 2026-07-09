@@ -30,8 +30,8 @@ If you're trying to use Instagram for dating (especially in the gay community), 
 | Is private | Optional | Display |
 | Is verified | Optional | Display |
 | Is business | Optional | Categorization signal |
-| Avatar URL | Optional | Profile photos on cards |
-| Profile URL | Optional | Not currently used |
+| Avatar URL | ✅ | Profile photos on cards |
+| Profile URL | ✅ | Not currently used |
 
 2. Open `index.html` in Chrome
 3. Drop your CSV
