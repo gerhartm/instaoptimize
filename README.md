@@ -56,14 +56,6 @@ Swipe through every account you follow. Each card shows:
 
 Swipe through accounts to build a dating prospect list. Right-swipe = interested, left = pass.
 
-Right-swipes are scored and sorted into three outreach tiers:
-
-| Tier | Score | Strategy |
-|------|-------|----------|
-| **Warm Now** | 60+ | DM immediately. Story reply → conversation within 24hrs |
-| **Build the Bridge** | 40-59 | Engage their content (likes, story replies) for 1-2 weeks, then slide in |
-| **Save for the Glow-Up** | <40 | Park these. Revisit when your profile is stronger |
-
 ## Categorization Engine
 
 The AI categorization uses a two-pass approach:
