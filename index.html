@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InstaOptimize</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{--bg:#08080a;--card:#131317;--cb:#1c1c22;--ch:#1a1a20;--acc:#ff3b5c;--grn:#00e676;--gg:rgba(0,230,118,0.12);--red:#ff3b5c;--rg:rgba(255,59,92,0.12);--gold:#ffd740;--t1:#f0eff4;--t2:#8a8994;--t3:#4e4d5e;--van:#b388ff;--vg:rgba(179,136,255,0.12);--lov:#ff6090;--lg:rgba(255,96,144,0.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+.sf{font-family:'Instrument Serif',serif;font-weight:400}
+.glow{position:fixed;top:-30%;left:50%;transform:translateX(-50%);width:120vw;height:60vh;pointer-events:none;z-index:0;background:radial-gradient(ellipse,rgba(255,59,92,0.04),transparent 70%)}
+.glow.vanity{background:radial-gradient(ellipse,rgba(179,136,255,0.06),transparent 70%)}
+.glow.love{background:radial-gradient(ellipse,rgba(255,96,144,0.06),transparent 70%)}
+.w{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:0 16px;display:flex;flex-direction:column;align-items:center}
+.upload{width:100%;max-width:440px;padding:56px 40px;border-radius:20px;border:2px dashed var(--cb);background:var(--card);text-align:center;cursor:pointer;transition:all .3s}
+.upload:hover{border-color:var(--acc);background:rgba(255,59,92,0.02)}
+.modes{display:flex;gap:14px;width:100%;max-width:440px}
+.mc{flex:1;padding:28px 20px;border-radius:20px;background:var(--card);border:1px solid var(--cb);cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.mc:hover{transform:translateY(-2px)}
+.mc .orb{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;filter:blur(20px)}
+.sc{width:100%;max-width:440px;background:var(--card);border-radius:20px;border:1px solid var(--cb);overflow:hidden;position:relative;transition:all .4s cubic-bezier(.4,0,.2,1)}
+.sc.lr{transform:translateX(420px) rotate(18deg);opacity:0}
+.sc.ll{transform:translateX(-420px) rotate(-18deg);opacity:0}
+.av{border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.tag{padding:2px 8px;border-radius:12px;font-size:10px;display:inline-flex;align-items:center;gap:4px}
+.stamp{position:absolute;z-index:3;padding:5px 16px;border-radius:8px;border:3px solid;font-weight:700;font-size:20px;letter-spacing:3px;text-transform:uppercase;opacity:.9}
+.stamp.r{top:28px;right:22px;border-color:var(--grn);color:var(--grn);transform:rotate(-12deg)}
+.stamp.l{top:28px;left:22px;border-color:var(--red);color:var(--red);transform:rotate(12deg)}
+.dg{position:absolute;top:0;width:40%;height:100%;z-index:2;pointer-events:none}
+.dg.r{right:0;background:linear-gradient(to left,var(--gg),transparent)}
+.dg.l{left:0;background:linear-gradient(to right,var(--rg),transparent)}
+.bs{flex:1;padding:12px;border-radius:12px;background:transparent;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.bs.l{border:1.5px solid var(--red);color:var(--red)}.bs.l:hover{background:var(--rg);transform:scale(1.02)}
+.bs.r{border:1.5px solid var(--grn);color:var(--grn)}.bs.r:hover{background:var(--gg);transform:scale(1.02)}
+.bv{padding:12px 14px;border-radius:12px;border:1.5px solid var(--cb);background:transparent;color:var(--t2);font-family:'DM Sans';font-weight:500;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.bv:hover{background:rgba(255,255,255,.03)}
+.kh{font-size:9px;opacity:.5;border:1px solid currentColor;border-radius:3px;padding:1px 4px}
+.ct{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;width:100%;max-width:440px}
+.ct button{padding:6px 12px;border-radius:20px;border:1px solid var(--cb);background:transparent;color:var(--t2);font-family:'DM Sans';font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+.ct button:hover{border-color:var(--t2)}.ct button.a{border-color:var(--van);color:var(--van);background:var(--vg)}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:var(--card);border-radius:8px;border:1px solid var(--cb);margin-bottom:3px}
+.rr a{font-size:12px;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:8px}
+.sb{flex:1;padding:18px;background:var(--card);border-radius:14px;border:1px solid var(--cb);text-align:center}
+.btn{padding:7px 12px;border-radius:8px;font-family:'DM Sans';font-size:12px;cursor:pointer;border:none}
+.resume-card{width:100%;max-width:440px;padding:18px 20px;border-radius:14px;background:var(--card);border:1px solid var(--cb);margin-bottom:12px;cursor:pointer;transition:all .2s}
+.resume-card:hover{border-color:var(--van);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+<div class="w" id="app"></div>
+<script>
+const LS_KEY="instaoptimize_sessions";
+
+// ─── State ───
+let S={screen:"home",mode:null,raw:[],queue:[],idx:0,results:[],dir:null,leaving:false,catFilter:"all",sessionId:null};
+
+// ─── Persistence ───
+function saveSession(){
+  if(!S.sessionId||!S.queue.length)return;
+  const sessions=JSON.parse(localStorage.getItem(LS_KEY)||"{}");
+  sessions[S.sessionId]={
+    mode:S.mode,
+    queue:S.queue.map(r=>r.Username),
+    idx:S.idx,
+    results:S.results.map(r=>({u:r.row.Username,d:r.decision})),
+    catFilter:S.catFilter,
+    ts:Date.now(),
+    total:S.queue.length,
+  };
+  // Store full data separately (keyed by username for dedup)
+  const dataKey=LS_KEY+"_data";
+  let allData=JSON.parse(localStorage.getItem(dataKey)||"{}");
+  S.raw.forEach(r=>{if(r.Username)allData[r.Username]=r;});
+  localStorage.setItem(dataKey,JSON.stringify(allData));
+  localStorage.setItem(LS_KEY,JSON.stringify(sessions));
+}
+
+function getSessions(){
+  return JSON.parse(localStorage.getItem(LS_KEY)||"{}");
+}
+
+function loadSession(id){
+  const sessions=getSessions();
+  const sess=sessions[id];
+  if(!sess)return false;
+  const dataKey=LS_KEY+"_data";
+  const allData=JSON.parse(localStorage.getItem(dataKey)||"{}");
+  // Reconstruct queue and results from stored usernames
+  const queueRows=sess.queue.map(u=>allData[u]).filter(Boolean);
+  const resultRows=sess.results.map(r=>({row:allData[r.u],decision:r.d})).filter(r=>r.row);
+  S.mode=sess.mode;
+  S.queue=queueRows;
+  S.raw=Object.values(allData);
+  S.idx=sess.idx;
+  S.results=resultRows;
+  S.catFilter=sess.catFilter||"all";
+  S.sessionId=id;
+  S.screen="swiping";
+  S.dir=null;S.leaving=false;
+  return true;
+}
+
+function deleteSession(id){
+  const sessions=getSessions();
+  delete sessions[id];
+  localStorage.setItem(LS_KEY,JSON.stringify(sessions));
+  render();
+}
+
+// ─── Categorization (same as before) ───
+const KC=new Set(["dj","musician/band","musician","music","record label","live music venue","dance & night club","festival","performance & event venue","party entertainment service","artist","art","visual arts","art gallery","illustrator","photographer","photography videography","film director","graphic designer","designer","creative director","fashion designer","choreographer","dancer","performance art theatre","cultural center"]);
+const UC=new Set(["news & media website","media/news company","news personality","media","journalist","magazine","tv show","movie","movie character","fan page","shopping & retail","shopping service","product/service","toy store","brand","health/beauty","home decor","design & fashion","pest control service","storage facility","construction company","solar energy service","advertising agency","social media agency","highway","canal","lighthouse","castle"]);
+const MUS=["dj","producer","club","nightlife","techno","house music","electronic","music","vinyl","rave","dance","booking","resident","promoter","festival","edm","disco","beats","remix","label","records","sound","audio","rekordbox","selector","amapiano","berghain","fabric","boiler room","mixmag","singer","songwriter","musician","concert","tour","spotify"];
+const ART=["artist","art ","gallery","painter","sculptor","creative director","designer","photographer","filmmaker","curator","illustrator","visual art","contemporary art","fine art","museum","exhibition","studio","canvas","creative","animation","graphic design","architect","graffiti","mural","tattoo artist"];
+const NW=["news","breaking","media","magazine","journal","reporter","editorial","press","newsroom","journalism","broadcast"];
+const ME=["meme","funny","comedy","viral","repost","shitpost","satire","humor","lol","lmao","relatable","cursed","parody"];
+const BR=["official","shop now","worldwide","\u00ae","\u2122","global brand","free shipping","use code","promo","limited edition","new collection","retail"];
+
+function cat(r){
+  const ig=(r.Category||"").toLowerCase().trim(),bio=(" "+(r.Bio||"").toLowerCase()+" "),u=(r.Username||"").toLowerCase();
+  const fl=parseInt((r.Followers||"0").replace(/,/g,""))||0,ps=r.Posts,pn=(ps!==undefined&&ps!==""&&ps!=="-")?parseInt(ps):null;
+  const priv=(r["Is private"]||"").toUpperCase()==="YES",biz=(r["Is business"]||"").toUpperCase()==="YES";
+  const mb=k=>k.some(w=>bio.includes(w)),mu=k=>k.some(w=>u.includes(w));
+  if(pn!==null&&pn<=2&&!priv)return{c:"unfollow_dead",l:"Dead Account",e:"💤",co:"#ef5350",t:"unfollow"};
+  if(ig&&KC.has(ig)){if(["dj","musician/band","musician","music","record label","live music venue","dance & night club","festival","performance & event venue","party entertainment service"].includes(ig))return{c:"keep_music",l:"Music/DJ/Club",e:"🎵",co:"#b388ff",t:"keep"};return{c:"keep_art",l:"Art/Creative",e:"🎨",co:"#ff8a65",t:"keep"};}
+  if(ig&&UC.has(ig)){if(["news & media website","media/news company","news personality","media","journalist","magazine"].includes(ig))return{c:"unfollow_news",l:"News/Media",e:"📰",co:"#ef5350",t:"unfollow"};if(["fan page","movie character"].includes(ig))return{c:"unfollow_memes",l:"Meme/Fan",e:"💀",co:"#ef5350",t:"unfollow"};return{c:"unfollow_brands",l:"Brand/Shop",e:"🏢",co:"#ef5350",t:"unfollow"};}
+  if(mb(MUS)||mu(["dj","music","beats","sound","records","vinyl","club"]))return{c:"keep_music",l:"Music/DJ/Club",e:"🎵",co:"#b388ff",t:"keep"};
+  if(mb(ART)||mu(["art","design","photo","studio","gallery","creative"]))return{c:"keep_art",l:"Art/Creative",e:"🎨",co:"#ff8a65",t:"keep"};
+  if(mb(NW)||mu(["news","times","media","press"]))return{c:"unfollow_news",l:"News/Media",e:"📰",co:"#ef5350",t:"unfollow"};
+  if((mb(ME)||mu(["meme","funny","comedy","lol","cursed"]))&&fl>5000)return{c:"unfollow_memes",l:"Meme/Fan",e:"💀",co:"#ef5350",t:"unfollow"};
+  if(fl>100000&&(mb(BR)||biz))return{c:"unfollow_brands",l:"Brand/Shop",e:"🏢",co:"#ef5350",t:"unfollow"};
+  if(fl>500000)return{c:"unfollow_brands",l:"Brand/Shop",e:"🏢",co:"#ef5350",t:"unfollow"};
+  if(fl<2000&&!biz)return{c:"keep_friends",l:"Friend/Family",e:"👥",co:"#69f0ae",t:"keep"};
+  if(fl>10000)return{c:"unfollow_10k",l:"10K+ Ratio Poison",e:"📉",co:"#ef5350",t:"unfollow"};
+  return{c:"unknown",l:"Unknown",e:"❓",co:"#78909c",t:"swipe"};
+}
+
+function lsc(r){let s=50;const fl=parseInt((r.Followers||"0").replace(/,/g,""))||0;if(fl>0&&fl<5000)s+=10;else if(fl>=5000&&fl<20000)s+=5;const bio=(r.Bio||"").toLowerCase();["crypto","defi","web3","nyc","new york","dj","music","fitness","gym","brooklyn","manhattan"].forEach(k=>{if(bio.includes(k))s+=3;});const city=(r.City||"").toLowerCase();if(city.includes("new york")||city.includes("brooklyn")||city.includes("manhattan"))s+=10;return Math.min(100,s);}
+
+function avImg(url,name,co,sz){
+  const esc=url?url.replace(/&/g,"&amp;"):"";
+  if(esc)return`<div class="av" style="width:${sz}px;height:${sz}px;background:linear-gradient(135deg,${co},var(--acc))"><img src="${esc}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="sf" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:${sz*.38}px;color:#fff">${(name||"?").charAt(0).toUpperCase()}</span></div>`;
+  return`<div class="av" style="width:${sz}px;height:${sz}px;background:linear-gradient(135deg,${co},var(--acc))"><span class="sf" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;font-size:${sz*.38}px;color:#fff">${(name||"?").charAt(0).toUpperCase()}</span></div>`;
+}
+
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/\n/g,"<br>");}
+
+// ─── Render ───
+function render(){
+  const app=document.getElementById("app"),glow=document.getElementById("glow");
+  glow.className="glow"+(S.mode==="vanity"?" vanity":S.mode==="love"?" love":"");
+  if(S.screen==="home")rHome(app);
+  else if(S.screen==="swiping")rSwipe(app);
+  else if(S.screen==="results")rResults(app);
+}
+
+function rHome(el){
+  const sessions=getSessions();
+  const sessionList=Object.entries(sessions).sort((a,b)=>b[1].ts-a[1].ts);
+
+  let h=`<div style="padding:40px 0 16px;text-align:center"><h1 class="sf" style="font-size:48px;font-style:italic;background:linear-gradient(135deg,var(--t1),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent">InstaOptimize</h1><p style="font-size:15px;color:var(--t3);font-weight:300;margin-top:8px">Clean your ratio. Find your person.</p></div>`;
+
+  // Resume cards
+  if(sessionList.length>0){
+    h+=`<div style="width:100%;max-width:440px;margin-bottom:20px">`;
+    h+=`<div style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:500">Resume Session</div>`;
+    sessionList.forEach(([id,sess])=>{
+      const pct=Math.round((sess.idx/sess.total)*100);
+      const decided=sess.results.length;
+      const kept=sess.results.filter(r=>r.d==="right").length;
+      const removed=sess.results.filter(r=>r.d==="left").length;
+      const when=new Date(sess.ts);
+      const timeAgo=Math.round((Date.now()-sess.ts)/60000);
+      const timeStr=timeAgo<60?`${timeAgo}m ago`:timeAgo<1440?`${Math.round(timeAgo/60)}h ago`:`${Math.round(timeAgo/1440)}d ago`;
+      h+=`<div class="resume-card" onclick="resumeSession('${id}')">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <span style="font-weight:600;font-size:14px;color:${sess.mode==='vanity'?'var(--van)':'var(--lov)'}">${sess.mode==='vanity'?'✨ Vanity':'🔥 Love'}</span>
+            <span style="font-size:11px;color:var(--t3);margin-left:8px">${timeStr}</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:11px;color:var(--t3)">${pct}%</span>
+            <button onclick="event.stopPropagation();deleteSession('${id}')" style="padding:2px 8px;border-radius:4px;border:1px solid var(--cb);background:transparent;color:var(--t3);font-size:10px;cursor:pointer;font-family:'DM Sans'">✕</button>
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:12px">
+          <span style="font-size:11px;color:var(--t2)">${decided}/${sess.total} reviewed</span>
+          <span style="font-size:11px;color:var(--grn)">✓ ${kept}</span>
+          <span style="font-size:11px;color:var(--red)">✕ ${removed}</span>
+        </div>
+        <div style="margin-top:6px;width:100%;height:3px;background:var(--cb);border-radius:2px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${sess.mode==='vanity'?'var(--van)':'var(--lov)'},var(--acc));border-radius:2px"></div>
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  if(!S.raw.length){
+    h+=`<div class="upload" id="uz"><div style="font-size:36px;margin-bottom:14px">📂</div><div class="sf" style="font-size:22px;color:var(--t1);margin-bottom:6px">Drop your CSV here</div><div style="font-size:13px;color:var(--t3);font-weight:300">or click to browse</div><input type="file" id="fi" accept=".csv" style="display:none"></div>`;
+  } else {
+    h+=`<div style="width:100%;max-width:440px;padding:14px 18px;border-radius:12px;background:var(--card);border:1px solid var(--cb);display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div style="font-weight:600;font-size:13px;color:var(--grn)">✓ ${S.raw.length} accounts loaded</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px;font-weight:300">With photos, bios, IG categories & city data</div></div>
+      <button onclick="S.raw=[];render()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--cb);background:transparent;color:var(--t3);font-family:'DM Sans';font-size:10px;cursor:pointer">Reset</button>
+    </div>`;
+    h+=`<div class="modes">
+      <div class="mc" onclick="startMode('vanity')" onmouseenter="this.style.borderColor='var(--van)'" onmouseleave="this.style.borderColor='var(--cb)'">
+        <div class="orb" style="background:var(--vg)"></div>
+        <div style="font-size:30px;margin-bottom:10px">✨</div>
+        <div class="sf" style="font-size:22px;color:var(--van)">Vanity</div>
+        <div style="font-size:12px;color:var(--t3);line-height:1.5;margin-top:6px;font-weight:300">Swipe every account. AI suggests keep/unfollow.</div>
+      </div>
+      <div class="mc" onclick="startMode('love')" onmouseenter="this.style.borderColor='var(--lov)'" onmouseleave="this.style.borderColor='var(--cb)'">
+        <div class="orb" style="background:var(--lg)"></div>
+        <div style="font-size:30px;margin-bottom:10px">🔥</div>
+        <div class="sf" style="font-size:22px;color:var(--lov)">Love</div>
+        <div style="font-size:12px;color:var(--t3);line-height:1.5;margin-top:6px;font-weight:300">Swipe with photos. Scored outreach plan.</div>
+      </div>
+    </div>`;
+  }
+  el.innerHTML=h;
+  const uz=document.getElementById("uz"),fi=document.getElementById("fi");
+  if(uz){
+    uz.onclick=()=>fi.click();
+    uz.ondragover=e=>{e.preventDefault();uz.style.borderColor="var(--acc)";};
+    uz.ondragleave=()=>uz.style.borderColor="var(--cb)";
+    uz.ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);};
+  }
+  if(fi)fi.onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0]);};
+}
+
+function rSwipe(el){
+  const row=S.queue[S.idx];
+  if(!row){S.screen="results";saveSession();render();return;}
+  const u=row.Username||"",bio=row.Bio||"",fl=parseInt((row.Followers||"0").replace(/,/g,""))||0;
+  const fn=row.Fullname||"",posts=row.Posts||"",igCat=row.Category||"";
+  const fing=parseInt((row.Following||"0").replace(/,/g,""))||0;
+  const ver=(row["Is verified"]||"").toUpperCase()==="YES";
+  const priv=(row["Is private"]||"").toUpperCase()==="YES";
+  const city=row.City||"",av=row["Avatar URL"]||"";
+  const info=cat(row),sc=S.mode==="love"?lsc(row):null;
+  const lb=S.mode==="vanity"?{r:"KEEP",l:"UNFOLLOW"}:{r:"YES",l:"PASS"};
+  const rem=S.queue.length-S.idx;
+  const catLabels={keep_music:"🎵 Music",keep_art:"🎨 Art",keep_friends:"👥 Friends",unfollow_brands:"🏢 Brands",unfollow_news:"📰 News",unfollow_memes:"💀 Memes",unfollow_dead:"💤 Dead",unfollow_10k:"📉 10K+",unknown:"❓ Other"};
+
+  let h=`<div style="padding:24px 0 10px;text-align:center;cursor:pointer" onclick="goHome()"><h1 class="sf" style="font-size:26px;font-style:italic;background:linear-gradient(135deg,var(--t1),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent">InstaOptimize</h1></div>`;
+
+  // Category filter tabs
+  h+=`<div class="ct"><button class="${S.catFilter==='all'?'a':''}" onclick="setCF('all')">All <span style="font-size:10px;opacity:.7">${rem}</span></button>`;
+  Object.entries(catLabels).forEach(([k,v])=>{
+    const cnt=S.queue.slice(S.idx).filter(r=>cat(r).c===k).length;
+    if(cnt>0)h+=`<button class="${S.catFilter===k?'a':''}" onclick="setCF('${k}')">${v} <span style="font-size:10px;opacity:.7">${cnt}</span></button>`;
+  });
+  h+=`</div>`;
+
+  // Progress + controls
+  const kept=S.results.filter(r=>r.decision==="right").length,removed=S.results.filter(r=>r.decision==="left").length;
+  h+=`<div style="width:100%;max-width:440px;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <span style="font-size:11px;color:var(--t3)">${S.idx} / ${S.queue.length}</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;color:var(--t3)">${removed} ✕ · ${kept} ✓</span>
+        ${S.results.length>0?`<button onclick="undo()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--cb);background:transparent;color:var(--t2);font-family:'DM Sans';font-size:11px;cursor:pointer">↩ Undo</button>`:''}
+        <button onclick="doExport()" style="padding:4px 10px;border-radius:6px;border:none;background:${S.mode==='vanity'?'var(--van)':'var(--lov)'};color:#fff;font-family:'DM Sans';font-size:11px;font-weight:600;cursor:pointer">Export ↓</button>
+        <button onclick="S.screen='results';render()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--cb);background:transparent;color:var(--t2);font-family:'DM Sans';font-size:11px;cursor:pointer">Results</button>
+      </div>
+    </div>
+    <div style="width:100%;height:3px;background:var(--cb);border-radius:2px;overflow:hidden">
+      <div style="width:${S.queue.length?(S.idx/S.queue.length)*100:0}%;height:100%;border-radius:2px;background:linear-gradient(90deg,${S.mode==='vanity'?'var(--van)':'var(--lov)'},var(--acc));transition:width .3s"></div>
+    </div>
+  </div>`;
+
+  // Card
+  const lc=S.leaving?(S.dir==="right"?"lr":"ll"):"";
+  const dg=S.dir&&!S.leaving?`<div class="dg ${S.dir}"></div>`:"";
+  const st=S.dir&&!S.leaving?`<div class="stamp ${S.dir[0]}">${lb[S.dir[0]]}</div>`:"";
+
+  h+=`<div class="sc ${lc}">
+    ${dg}${st}
+    <div style="padding:24px 24px 0;display:flex;gap:16px;align-items:flex-start">
+      <a href="https://instagram.com/${u}" target="_blank" style="text-decoration:none">${avImg(av,u,info.co,72)}</a>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <a href="https://instagram.com/${u}" target="_blank" class="sf" style="font-size:22px;color:var(--t1);text-decoration:none;line-height:1.1">@${esc(u)}</a>
+          ${ver?'<span style="color:#4fc3f7;font-size:14px">✓</span>':''}
+          ${priv?'<span style="font-size:10px;color:var(--t3);padding:1px 6px;border-radius:4px;border:1px solid var(--t3)">🔒</span>':''}
+        </div>
+        ${fn?`<div style="font-size:13px;color:var(--t2);margin-top:2px">${esc(fn)}</div>`:''}
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          ${igCat?`<span class="tag" style="background:rgba(255,255,255,.06);color:var(--t2)">${esc(igCat)}</span>`:''}
+          ${city?`<span class="tag" style="background:rgba(255,255,255,.06);color:var(--t2)">📍${esc(city)}</span>`:''}
+          <span class="tag" style="background:${info.co}15;color:${info.co};font-weight:500">${info.e} AI: ${info.l}</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:20px;padding:14px 24px;border-bottom:1px solid var(--cb)">
+      <div style="text-align:center"><div style="font-weight:700;font-size:16px">${fl.toLocaleString()}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">followers</div></div>
+      <div style="text-align:center"><div style="font-weight:700;font-size:16px">${fing.toLocaleString()}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">following</div></div>
+      ${posts&&posts!=="-"?`<div style="text-align:center"><div style="font-weight:700;font-size:16px">${parseInt(posts).toLocaleString()}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">posts</div></div>`:''}
+      ${sc!==null?`<div style="text-align:center"><div style="font-weight:700;font-size:16px;color:${sc>70?'var(--grn)':sc>50?'var(--gold)':'var(--t2)'}">${sc}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">score</div></div>`:''}
+    </div>
+    ${bio?`<div style="padding:12px 24px;font-size:13px;line-height:1.6;color:var(--t2);max-height:80px;overflow:hidden;white-space:pre-line">${esc(bio)}</div>`:''}
+    <div style="display:flex;padding:14px 24px 20px;gap:8px">
+      <button class="bs l" onclick="doSwipe('left')"><span class="kh">←</span>${S.mode==='vanity'?'Unfollow':'Pass'}</button>
+      <a href="https://instagram.com/${u}" target="_blank" class="bv">View</a>
+      <button class="bs r" onclick="doSwipe('right')">${S.mode==='vanity'?'Keep':'Yes'}<span class="kh">→</span></button>
+    </div>
+  </div>`;
+  h+=`<div style="margin-top:14px;font-size:11px;color:var(--t3);font-weight:300">← → arrow keys · Cmd+Z undo</div>`;
+  el.innerHTML=h;
+}
+
+function rResults(el){
+  const yes=S.results.filter(r=>r.decision==="right"),no=S.results.filter(r=>r.decision==="left");
+  const done=S.idx>=S.queue.length;
+
+  let h=`<div style="padding:24px 0 10px;text-align:center;cursor:pointer" onclick="goHome()"><h1 class="sf" style="font-size:26px;font-style:italic;background:linear-gradient(135deg,var(--t1),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent">InstaOptimize</h1></div>`;
+  h+=`<div style="width:100%;max-width:560px">`;
+  h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+    <h2 class="sf" style="font-size:28px">${S.mode==='vanity'?'Ratio Results':'Your Prospects'}</h2>
+    <div style="display:flex;gap:8px">
+      ${!done?`<button class="btn" style="border:1px solid var(--cb);background:transparent;color:var(--t2)" onclick="S.screen='swiping';render()">← Continue Swiping</button>`:''}
+      <button class="btn" style="border:1px solid var(--cb);background:transparent;color:var(--t2)" onclick="goHome()">Home</button>
+      <button class="btn" style="background:${S.mode==='vanity'?'var(--van)':'var(--lov)'};color:#fff;font-weight:600" onclick="doExport()">Export CSV ↓</button>
+    </div>
+  </div>`;
+
+  if(S.mode==="vanity"){
+    h+=`<div style="display:flex;gap:10px;margin-bottom:24px">
+      <div class="sb"><div style="font-weight:700;font-size:32px;color:var(--red)">${no.length}</div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Unfollow</div></div>
+      <div class="sb"><div style="font-weight:700;font-size:32px;color:var(--grn)">${yes.length}</div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Keep</div></div>
+    </div>`;
+    h+=`<h3 class="sf" style="font-size:18px;color:var(--red);margin-bottom:8px">Unfollow List (${no.length})</h3>`;
+    h+=`<div style="max-height:500px;overflow-y:auto">`;
+    no.forEach(r=>{
+      const row=r.row,u=row.Username||"";
+      h+=`<div class="rr"><a href="https://instagram.com/${u}" target="_blank">${avImg(row["Avatar URL"]||"",u,"var(--red)",24)} @${esc(u)}</a><span style="font-size:10px;color:var(--t3)">${(parseInt((row.Followers||"0").replace(/,/g,""))||0).toLocaleString()}</span></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  if(S.mode==="love"){
+    const sorted=[...yes].sort((a,b)=>lsc(b.row)-lsc(a.row));
+    [{l:"Warm Now — DM These",d:"Highest score. Story reply → DM within 24hrs.",co:"var(--grn)",items:sorted.filter(r=>lsc(r.row)>=60)},
+     {l:"Build the Bridge",d:"Engage their content for 1-2 weeks, then slide in.",co:"var(--gold)",items:sorted.filter(r=>lsc(r.row)>=40&&lsc(r.row)<60)},
+     {l:"Save for the Glow-Up",d:"Revisit in July when you're shredded.",co:"var(--lov)",items:sorted.filter(r=>lsc(r.row)<40)},
+    ].forEach(t=>{
+      h+=`<h3 class="sf" style="font-size:18px;color:${t.co};margin:0 0 3px">${t.l} (${t.items.length})</h3>
+        <p style="font-size:11px;color:var(--t3);margin:0 0 8px;font-weight:300">${t.d}</p><div style="margin-bottom:24px">`;
+      t.items.forEach(r=>{
+        const row=r.row,u=row.Username||"";
+        h+=`<div class="rr"><a href="https://instagram.com/${u}" target="_blank">${avImg(row["Avatar URL"]||"",u,t.co,24)} @${esc(u)}</a><span style="font-weight:600;font-size:11px;color:${lsc(row)>70?'var(--grn)':'var(--t3)'}">${lsc(row)}</span></div>`;
+      });
+      if(!t.items.length)h+=`<div style="padding:12px;font-size:11px;color:var(--t3);font-style:italic">No one here yet</div>`;
+      h+=`</div>`;
+    });
+  }
+  h+=`</div>`;
+  el.innerHTML=h;
+}
+
+// ─── Actions ───
+function loadFile(f){Papa.parse(f,{header:true,skipEmptyLines:true,complete:r=>{S.raw=r.data;render();}});}
+
+function startMode(m){
+  S.mode=m;S.results=[];S.idx=0;S.dir=null;S.leaving=false;S.catFilter="all";
+  S.sessionId=m+"_"+Date.now();
+  const sorted=[...S.raw].sort((a,b)=>{const o={unfollow:0,swipe:1,keep:2};return(o[cat(a).t]||1)-(o[cat(b).t]||1);});
+  S.queue=sorted;S.screen="swiping";saveSession();render();
+}
+
+function resumeSession(id){if(loadSession(id))render();}
+function goHome(){saveSession();S.screen="home";S.mode=null;render();}
+
+function setCF(c){
+  S.catFilter=c;
+  if(c!=="all"){
+    const rem=S.queue.slice(S.idx);
+    const match=rem.filter(r=>cat(r).c===c);
+    const rest=rem.filter(r=>cat(r).c!==c);
+    S.queue=[...S.queue.slice(0,S.idx),...match,...rest];
+  }
+  render();
+}
+
+function doSwipe(d){
+  if(S.leaving||S.idx>=S.queue.length)return;
+  S.dir=d;render();
+  setTimeout(()=>{S.leaving=true;render();
+    setTimeout(()=>{S.results.push({row:S.queue[S.idx],decision:d});S.idx++;S.dir=null;S.leaving=false;
+      saveSession();
+      if(S.idx>=S.queue.length)S.screen="results";
+      render();
+    },350);
+  },150);
+}
+
+function undo(){
+  if(!S.results.length)return;
+  S.results.pop();S.idx--;S.dir=null;S.leaving=false;saveSession();render();
+}
+
+function doExport(){
+  const rows=[];
+  if(S.mode==="vanity"){
+    S.results.forEach(r=>rows.push({username:r.row.Username,decision:r.decision==="right"?"keep":"unfollow",followers:r.row.Followers,category:cat(r.row).l}));
+  }else{
+    S.results.forEach(r=>rows.push({username:r.row.Username,decision:r.decision==="right"?"interested":"pass",score:lsc(r.row),followers:r.row.Followers}));
+  }
+  if(!rows.length)return;
+  const h=Object.keys(rows[0]);
+  const csv=[h.join(","),...rows.map(r=>h.map(k=>`"${((r[k]||"")+"").replace(/"/g,'""')}"`).join(","))].join("\n");
+  const b=new Blob([csv],{type:"text/csv"});const u=URL.createObjectURL(b);
+  const a=document.createElement("a");a.href=u;a.download=`${S.mode}_results_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  URL.revokeObjectURL(u);
+}
+
+// ─── Keyboard ───
+document.addEventListener("keydown",e=>{
+  if(S.screen!=="swiping")return;
+  if(e.key==="ArrowLeft")doSwipe("left");
+  if(e.key==="ArrowRight")doSwipe("right");
+  if(e.key==="z"&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
+});
+
+render();
+</script>
+</body>
+</html>
